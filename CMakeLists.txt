@@ -1,17 +1,39 @@
-cmake_minimum_required(VERSION 2.4.6)
-include($ENV{ROS_ROOT}/core/rosbuild/rosbuild.cmake)
+cmake_minimum_required(VERSION 2.8.3)
+project(icarus_pc)
 
-# Append to CPACK_SOURCE_IGNORE_FILES a semicolon-separated list of
-# directories (or patterns, but directories should suffice) that should
-# be excluded from the distro.  This is not the place to put things that
-# should be ignored everywhere, like "build" directories; that happens in
-# rosbuild/rosbuild.cmake.  Here should be listed packages that aren't
-# ready for inclusion in a distro.
-#
-# This list is combined with the list in rosbuild/rosbuild.cmake.  Note
-# that CMake 2.6 may be required to ensure that the two lists are combined
-# properly.  CMake 2.4 seems to have unpredictable scoping rules for such
-# variables.
-#list(APPEND CPACK_SOURCE_IGNORE_FILES /core/experimental)
+## Find catkin and any catkin packages
+find_package(catkin REQUIRED COMPONENTS roscpp rospy std_msgs genmsg cv_bridge image_transport)
+find_package (OpenCV REQUIRED)
 
-rosbuild_make_distribution(0.1.0)
+# CONFIGURE OPENNI2
+find_library(OPENNI2_LIBRARY
+	NAMES OpenNI2
+	PATHS "~/OpenNI-Linux-Arm-2.2/Redist" "~/OpenNI-Linux-x64-2.2/Redist"
+)
+find_path(OPENNI2_INCLUDE_DIR OpenNI.h
+	PATHS "~/OpenNI-Linux-Arm-2.2/Include" "~/OpenNI-Linux-x64-2.2/Include"
+)
+
+#link_directories(${OPENNI2_LIBRARY})
+#include_directories(${OPENNI2_INCLUDE_DIR})
+
+## Declare ROS messages and services
+#add_message_files(FILES Num.msg)
+#add_service_files(FILES AddTwoInts.srv)
+
+## Generate added messages and services
+#generate_messages(DEPENDENCIES std_msgs)
+
+## Declare a catkin package
+catkin_package()
+
+## Build talker and listener
+include_directories(include ${catkin_INCLUDE_DIRS} ${OPENNI2_INCLUDE_DIR})
+
+add_executable(xtionsender nodes/xtionsender.cpp)
+target_link_libraries(xtionsender ${catkin_LIBRARIES} ${OPENNI2_LIBRARY} ${OpenCV_LIBS})
+add_dependencies(xtionsender icarus_pc_generate_messages_cpp)
+
+#add_executable(listener src/listener.cpp)
+#target_link_libraries(listener ${catkin_LIBRARIES})
+#add_dependencies(listener beginner_tutorials_generate_messages_cpp)
