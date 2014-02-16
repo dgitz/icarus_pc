@@ -33,7 +33,8 @@ job_server = pp.Server(4,ppservers=ppservers)
 
 
 masterimage_dir = os.getcwd()+'/../media/MasterImages/'
-trainimage_dir = os.getcwd()+'/../media/TrainImages/'
+trainimage_dir = os.getcwd()+'/../media/SimulatedImages/'+time.strftime("%Y_%m_%d_%H_%M_%S")+"/"
+os.mkdir(trainimage_dir)
 environmentimage_dir = os.getcwd()+'/../media/EnvironmentImages/'
 avg_seqtime = 0.0
 avg_partime = 0.0
@@ -60,6 +61,7 @@ def deleteimages():
 		os.remove(trainimage_dir+f)	
 def createtrainimages(masterimage_index,paths,names,patterns,minf,maxf,newdir,environmentdir,envpaths):
 	master_images = []
+	
 	env_image = cv2.imread(envpaths[0])	
 	for i in range(len(names)):
 		master_images.append(cv2.imread(paths[i]))
@@ -109,7 +111,7 @@ for t in range(Trials):
 	
 	#Parallel Code
 	if UseParallel:
-		deleteimages()
+		#deleteimages()
 		start_time = time.time()
 
 		masterimage_range = range(len(masterimage_names))
@@ -121,7 +123,7 @@ for t in range(Trials):
 		job_server.print_stats()
 		avg_partime = avg_partime + elapsed_time
 	else:
-		deleteimages()
+		#deleteimages()
 		start_time = time.time()
 		for index in range(len(masterimage_names)):
 			createtrainimages(index,masterimage_paths,masterimage_names,Patterns,min_factor,max_factor,trainimage_dir,environmentimage_dir,environmentimage_paths)
